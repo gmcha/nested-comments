@@ -1,5 +1,7 @@
+import { PostList } from "./components/PostLists"
+
 function App() {
-  return <h1>Hello World!</h1>
+  return <PostList />
 }
 
 export default App;

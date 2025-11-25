@@ -1,11 +1,16 @@
 import fastify from "fastify"
 import sensible from "@fastify/sensible"
+import cors from "@fastify/cors"
 import dotenv from "dotenv"
 import { PrismaClient } from "@prisma/client"
 dotenv.config()
 
 const app = fastify()
 app.register(sensible)
+app.register(cors, {
+  origin: true,
+  credentials: true,
+})
 const prisma = new PrismaClient()
 
 app.get("/posts", async (req, res) => {
@@ -25,4 +30,6 @@ async function commitToDb(promise) {
     return data
 }
 
-app.listen({ port: process.env.PORT })
+app.listen({ port: process.env.PORT }).then(() => {
+  console.log(`Server running on http://localhost:${process.env.PORT}`);
+});
