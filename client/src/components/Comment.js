@@ -4,8 +4,9 @@ import { usePost } from "../contexts/PostContext"
 import { CommentList } from "./CommentList"
 import { useState } from "react"
 import { useAsyncFn } from "../hooks/useAsync"
-import { createComment, updateComment } from "../services/comments"
+import { createComment, updateComment, deleteComment } from "../services/comments"
 import { CommentForm } from "./CommentForm"
+import { useUser } from "../hooks/useUser"
 
 
 const dateFormatter = new Intl.DateTimeFormat(undefined, { 
@@ -17,10 +18,12 @@ export function Comment({ id, message, user, createdAt }){
     const [areChildrenHidden, setAreChildrenHidden] = useState(false)
     const [isReplying, setIsReplying] = useState(false)
     const [isEditing, setIsEditing] = useState(false)
-    const { post, getReplies, createLocalComment, updateLocalComment } = usePost()
+    const { post, getReplies, createLocalComment, updateLocalComment, deleteLocalComment } = usePost()
     const createCommentFn = useAsyncFn(createComment)
     const updateCommentFn = useAsyncFn(updateComment)
+    const deleteCommentFn = useAsyncFn(deleteComment)
     const childComments = getReplies(id)
+    const currentUser = useUser()
 
     function onCommentReply(message){
         return createCommentFn
@@ -36,9 +39,14 @@ export function Comment({ id, message, user, createdAt }){
             .execute({ postId: post.id, message, id })
             .then(comment => {
                 setIsEditing(false)
-                console.log(comment)
                 updateLocalComment( id, comment.message )
             })
+    }
+
+    function onCommentDelete(message){
+        return deleteCommentFn
+            .execute({ postId: post.id, id })
+            .then(comment => deleteLocalComment(comment.id))
     }
 
     return (
@@ -68,14 +76,27 @@ export function Comment({ id, message, user, createdAt }){
                         Icon={FaReply} 
                         aria-label={isReplying ? "Cancel Reply" : "Reply"} 
                     />
-                    <IconBtn
-                        onClick={() => {setIsEditing(prev => !prev)}}
-                        isActive={isEditing}
-                        Icon={FaEdit} 
-                        aria-label={isEditing ? "Cancel Edit" : "Edit"} 
-                    />
-                    <IconBtn Icon={FaTrash} aria-label="Delete" color="danger" />
+                    {user.id === currentUser.id && (
+                        <>
+                            <IconBtn
+                                onClick={() => {setIsEditing(prev => !prev)}}
+                                isActive={isEditing}
+                                Icon={FaEdit} 
+                                aria-label={isEditing ? "Cancel Edit" : "Edit"} 
+                            />
+                            <IconBtn 
+                                disabled={deleteCommentFn.loading}
+                                onClick={onCommentDelete}
+                                Icon={FaTrash} 
+                                aria-label="Delete" 
+                                color="danger" 
+                            />
+                        </>
+                    )}
                 </div>
+                {deleteCommentFn.error && (
+                    <div className="error-msg mt-1">{deleteCommentFn.error}</div>
+                )}
             </div>
             {isReplying && (
                 <div className="mt-1 ml-3">
