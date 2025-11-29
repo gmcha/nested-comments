@@ -12,6 +12,7 @@ app.register(cookie, { secret: process.env.COOKIE_SECRET })
 app.register(cors, {
   origin: true,
   credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
 })
 app.addHook("onRequest", (req, res, done) => {
   if (req.cookies.userId !== CURRENT_USER_ID){
@@ -83,6 +84,32 @@ app.post("/posts/:id/comments", async (req, res) => {
         },
         select: COMMENT_SELECT_FIELDS,
       })
+  )
+})
+
+app.put("/posts/:postId/comments/:commentId", async (req, res) => {
+  if (req.body.message === "" || req.body.message == null) {
+    return res.send(app.httpErrors.badRequest("Message is required"))
+  }
+
+  const { userId } = await prisma.comment.findUnique({
+    where: { id: req.params.commentId },
+    select: { userId: true },
+  })
+  if (userId !== req.cookies.userId) {
+    return res.send(
+      app.httpErrors.unauthorized(
+        "You do not have permission to edit this message"
+      )
+    )
+  }
+
+  return await commitToDb(
+    prisma.comment.update({
+      where: { id: req.params.commentId },
+      data: { message: req.body.message },
+      select: { message: true },
+    })
   )
 })
 
