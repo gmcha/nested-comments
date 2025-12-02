@@ -1,18 +1,19 @@
 import React, { useContext, useEffect, useMemo, useState } from "react"
 import { useParams } from "react-router-dom"
 import { useAsync } from "../hooks/useAsync"
-import { getPost } from "../services/posts"
+import { getChapter } from "../services/books"
 
 const Context = React.createContext()
 
-export function usePost() {
+export function useChapter() {
     return useContext(Context)
 }
 
-export function PostProvider({ children }) {
-    const { id } = useParams()
-    const { loading, error, value: post } = useAsync(() => getPost(id), [id])
+export function ChapterProvider({ children }) {
+    const { chapterId } = useParams()
+    const { loading, error, value: chapter } = useAsync(() => getChapter(chapterId), [chapterId])
     const [comments, setComments] = useState([])
+    
     const commentsByParentId = useMemo(() => {
         const group = {}
         comments.forEach(comment => {
@@ -23,9 +24,9 @@ export function PostProvider({ children }) {
     }, [comments])
 
     useEffect(() => {
-        if (post?.comments == null) return
-        setComments(post.comments)
-    }, [post?.comments])
+        if (chapter?.comments == null) return
+        setComments(chapter.comments)
+    }, [chapter?.comments])
 
     function getReplies(parentId) {
         return commentsByParentId[parentId]
@@ -57,31 +58,31 @@ export function PostProvider({ children }) {
 
     function toggleLocalCommentLike(id, addLike) {
         setComments(prevComments => {
-        return prevComments.map(comment => {
-            if (id === comment.id) {
-            if (addLike) {
-                return {
-                ...comment,
-                likeCount: comment.likeCount + 1,
-                likedByMe: true,
+            return prevComments.map(comment => {
+                if (id === comment.id) {
+                    if (addLike) {
+                        return {
+                            ...comment,
+                            likeCount: comment.likeCount + 1,
+                            likedByMe: true,
+                        }
+                    } else {
+                        return {
+                            ...comment,
+                            likeCount: comment.likeCount - 1,
+                            likedByMe: false,
+                        }
+                    }
+                } else {
+                    return comment
                 }
-            } else {
-                return {
-                ...comment,
-                likeCount: comment.likeCount - 1,
-                likedByMe: false,
-                }
-            }
-            } else {
-            return comment
-            }
-        })
+            })
         })
     } 
     
     return (<Context.Provider 
         value={{
-            post: {id, ...post},
+            chapter: {id: chapterId, ...chapter},
             rootComments: commentsByParentId[null],
             getReplies,
             createLocalComment,
@@ -100,3 +101,5 @@ export function PostProvider({ children }) {
         </Context.Provider>
     )
 }
+
+

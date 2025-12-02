@@ -1,12 +1,12 @@
 import { IconBtn } from './IconBtn.js'
 import { FaHeart, FaReply, FaEdit, FaTrash, FaRegHeart } from "react-icons/fa"
-import { usePost } from "../contexts/PostContext"
+import { useChapter } from "../contexts/ChapterContext"
 import { CommentList } from "./CommentList"
 import { useState } from "react"
 import { useAsyncFn } from "../hooks/useAsync"
 import { createComment, updateComment, deleteComment, toggleCommentLike } from "../services/comments"
 import { CommentForm } from "./CommentForm"
-import { useUser } from "../hooks/useUser"
+import { useAuth } from "../contexts/AuthContext"
 
 
 const dateFormatter = new Intl.DateTimeFormat(undefined, { 
@@ -18,17 +18,17 @@ export function Comment({ id, message, user, createdAt, likeCount, likedByMe }){
     const [areChildrenHidden, setAreChildrenHidden] = useState(false)
     const [isReplying, setIsReplying] = useState(false)
     const [isEditing, setIsEditing] = useState(false)
-    const { post, getReplies, createLocalComment, updateLocalComment, deleteLocalComment, toggleLocalCommentLike } = usePost()
+    const { chapter, getReplies, createLocalComment, updateLocalComment, deleteLocalComment, toggleLocalCommentLike } = useChapter()
     const createCommentFn = useAsyncFn(createComment)
     const updateCommentFn = useAsyncFn(updateComment)
     const deleteCommentFn = useAsyncFn(deleteComment)
     const toggleCommentLikeFn = useAsyncFn(toggleCommentLike)
     const childComments = getReplies(id)
-    const currentUser = useUser()
+    const { user: currentUser } = useAuth()
 
     function onCommentReply(message){
         return createCommentFn
-            .execute({ postId: post.id, message, parentId: id })
+            .execute({ chapterId: chapter.id, message, parentId: id })
             .then(comment => {
                 setIsReplying(false)
                 createLocalComment(comment)
@@ -37,7 +37,7 @@ export function Comment({ id, message, user, createdAt, likeCount, likedByMe }){
 
     function onCommentUpdate(message){
         return updateCommentFn
-            .execute({ postId: post.id, message, id })
+            .execute({ chapterId: chapter.id, message, id })
             .then(comment => {
                 setIsEditing(false)
                 updateLocalComment( id, comment.message )
@@ -46,13 +46,13 @@ export function Comment({ id, message, user, createdAt, likeCount, likedByMe }){
 
     function onCommentDelete(message){
         return deleteCommentFn
-            .execute({ postId: post.id, id })
+            .execute({ chapterId: chapter.id, id })
             .then(comment => deleteLocalComment(comment.id))
     }
 
     function onToggleCommentLike() {
         return toggleCommentLikeFn
-        .execute({ id, postId: post.id })
+        .execute({ id, chapterId: chapter.id })
         .then(({ addLike }) => toggleLocalCommentLike(id, addLike))
     }
 
@@ -60,7 +60,7 @@ export function Comment({ id, message, user, createdAt, likeCount, likedByMe }){
         <>
             <div className="comment">
                 <div className="header">
-                    <span className="name">{user.name}</span>
+                    <span className="name">{user.nickname}</span>
                     <span className="date">{dateFormatter.format(Date.parse(createdAt))}</span>
                 </div>
                 {isEditing ? (
@@ -76,19 +76,21 @@ export function Comment({ id, message, user, createdAt, likeCount, likedByMe }){
                 <div className="footer">
                     <IconBtn 
                         onClick={onToggleCommentLike}
-                        disabled={toggleCommentLikeFn.loading}
+                        disabled={toggleCommentLikeFn.loading || !currentUser}
                         Icon={likedByMe ? FaHeart : FaRegHeart} 
                         aria-label={likedByMe ? "Unlike" : "Like"} 
                     >
                         {likeCount}
                     </IconBtn>
-                    <IconBtn
-                        onClick={() => {setIsReplying(prev => !prev)}}
-                        isActive={isReplying}
-                        Icon={FaReply} 
-                        aria-label={isReplying ? "Cancel Reply" : "Reply"} 
-                    />
-                    {user.id === currentUser.id && (
+                    {currentUser && (
+                        <IconBtn
+                            onClick={() => {setIsReplying(prev => !prev)}}
+                            isActive={isReplying}
+                            Icon={FaReply} 
+                            aria-label={isReplying ? "Cancel Reply" : "Reply"} 
+                        />
+                    )}
+                    {currentUser && user.id === currentUser.id && (
                         <>
                             <IconBtn
                                 onClick={() => {setIsEditing(prev => !prev)}}
@@ -143,4 +145,3 @@ export function Comment({ id, message, user, createdAt, likeCount, likedByMe }){
         </>
     )
 }
-

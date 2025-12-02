@@ -6,6 +6,8 @@ body {
   margin: 0;
   font-family: Arial, Helvetica, sans-serif;
   line-height: 1.4;
+  background-color: #f4f6f8;
+  color: #333;
 }
 
 .container {
@@ -14,22 +16,271 @@ body {
   margin: 2rem auto;
 }
 
-button {
-  font-size: inherit;
-  font-family: inherit;
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Common Utility */
+.btn {
+  --hue: 235;
+  --color: hsl(var(--hue), 100%, 67%);
+  padding: .5em 1em;
+  background: var(--color);
+  border: none;
+  color: white;
+  border-radius: .5em;
+  font-size: .9em;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn:hover,
+.btn:focus-visible {
+  --color: hsl(var(--hue), 100%, 74%);
+  background-color: var(--color);
+}
+
+.btn[disabled] {
+  --color: hsl(var(--hue), 20%, 74%);
+  cursor: not-allowed;
+}
+
+.btn-outline {
+  background: transparent;
+  border: 1px solid #ccc;
+  padding: .4em .8em;
+  border-radius: .5em;
+  cursor: pointer;
 }
 
 .error-msg {
   color: hsl(0, 100%, 67%);
+  margin-bottom: 1rem;
 }
 
-.comments-title {
+/* Auth Pages */
+.auth-container {
+  max-width: 400px;
+  margin: 4rem auto;
+  padding: 2rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.auth-container h1 {
+  margin-top: 0;
+  text-align: center;
+  color: hsl(235, 100%, 67%);
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: .5rem;
+  font-weight: bold;
+}
+
+.form-group input {
+  width: 100%;
+  padding: .5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+/* Main Page (BookList) */
+.main-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding: 1rem 2rem;
+  background-color: hsl(235, 100%, 67%);
+  color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.main-header h1 {
+  color: white;
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.user-info {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.user-info span {
+  font-weight: bold;
+}
+
+/* Button variants for header */
+.btn-white {
+  background-color: white;
+  color: hsl(235, 100%, 67%);
+  border: none;
+  padding: .5em 1em;
+  border-radius: .5em;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-white:hover {
+  background-color: #f0f0f0;
+}
+
+.btn-white-outline {
+  background-color: transparent;
+  color: white;
+  border: 1px solid white;
+  padding: .4em .9em; /* Adjust for border */
+  border-radius: .5em;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-white-outline:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.search-bar {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.search-bar form {
+  display: inline-flex;
+  gap: .5rem;
+}
+
+.search-bar input {
+  padding: .5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 300px;
+}
+
+.book-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.book-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  transition: transform 0.2s;
+  border: 1px solid #eee;
+}
+
+.book-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.book-card h2 {
+  margin: 0 0 .5rem 0;
+  font-size: 1.2rem;
+  color: hsl(235, 100%, 67%);
+}
+
+.book-card .author {
+  color: #666;
+  margin: 0;
+}
+
+/* Book Detail */
+.book-detail-container {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 1rem;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.back-link:hover {
+  color: hsl(235, 100%, 67%);
+  text-decoration: underline;
+}
+
+.chapter-list {
+  margin-top: 2rem;
+}
+
+.chapter-list ul {
+  list-style: none;
+  padding: 0;
+}
+
+.chapter-list li {
   margin-bottom: .5rem;
 }
 
+.chapter-list li a {
+  display: block;
+  padding: .75rem;
+  background: #f8f9fa;
+  border-radius: 4px;
+  border: 1px solid #eee;
+}
+
+.chapter-list li a:hover {
+  background: #eef2ff;
+  border-color: hsl(235, 100%, 80%);
+  color: hsl(235, 100%, 67%);
+}
+
+/* Chapter Detail & Comments (Existing + Updates) */
+.chapter-header {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  margin-bottom: 2rem;
+}
+
+.comments-title {
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+  border-bottom: 2px solid #eee;
+  padding-bottom: .5rem;
+}
+
+.login-prompt {
+  padding: 1rem;
+  background: #e9ecef;
+  border-radius: 4px;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.login-prompt a {
+  color: hsl(235, 100%, 67%);
+  font-weight: bold;
+}
+
+/* Reuse existing comment styles below */
 .comment-form-row {
   display: flex;
   gap: .5rem;
+  margin-bottom: 1rem;
 }
 
 .message-input {
@@ -49,13 +300,9 @@ button {
   outline: none;
 }
 
-.mt-4 {
-  margin-top: 1rem;
-}
-
-.mt-1 {
-  margin-top: .25rem;
-}
+.mt-4 { margin-top: 1rem; }
+.mt-1 { margin-top: .25rem; }
+.ml-3 { margin-left: 1.5rem; }
 
 .comment-stack {
   margin: .5rem 0;
@@ -102,26 +349,7 @@ button {
   transition: background-color 100ms ease-in-out;
 }
 
-.hide {
-  display: none;
-}
-
-.btn {
-  --hue: 235;
-  --color: hsl(var(--hue), 100%, 67%);
-  padding: .5em 1em;
-  background: var(--color);
-  border: none;
-  color: white;
-  border-radius: .5em;
-  font-size: .75em;
-  cursor: pointer;
-}
-
-.btn:hover,
-.btn:focus-visible {
-  --color: hsl(var(--hue), 100%, 74%);
-}
+.hide { display: none; }
 
 .btn.icon-btn {
   background: none;
@@ -131,9 +359,7 @@ button {
   align-items: center;
 }
 
-.mr-1 {
-  margin-right: .25em;
-}
+.mr-1 { margin-right: .25em; }
 
 .icon-btn:hover,
 .icon-btn:focus-visible {
@@ -163,39 +389,32 @@ button {
 }
 
 .comment {
-  padding: .5rem;
-  border: 1px solid hsl(235, 100%, 90%);
+  padding: .75rem;
+  background: white;
+  border: 1px solid #e1e4e8;
   border-radius: .5rem;
 }
 
 .comment .header {
-  color: hsl(235, 50%, 67%);
+  color: #586069;
   display: flex;
   justify-content: space-between;
-  margin-bottom: .25rem;
-  font-size: .75em;
+  margin-bottom: .5rem;
+  font-size: .85em;
 }
 
 .comment .header .name {
   font-weight: bold;
+  color: #24292e;
 }
 
 .comment .message {
   white-space: pre-wrap;
-  margin-left: .5rem;
-  margin-right: .5rem;
+  color: #24292e;
 }
 
 .comment .footer {
   display: flex;
   gap: .5rem;
   margin-top: .5rem;
-}
-
-.ml-3 {
-  margin-left: 1.5rem;
-}
-
-.btn[disabled] {
-  --color: hsl(var(--hue), 20%, 74%);
 }

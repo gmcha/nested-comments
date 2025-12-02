@@ -15,16 +15,26 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Post {
+model Book {
   id       String    @id @default(uuid())
   title    String
-  body     String    @db.VarChar(10000)
+  author   String
+  chapters Chapter[]
+}
+
+model Chapter {
+  id       String    @id @default(uuid())
+  title    String
+  book     Book      @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  bookId   String
   comments Comment[]
 }
 
 model User {
   id       String    @id @default(uuid())
-  name     String
+  nickname String    @unique
+  email    String    @unique
+  password String
   comments Comment[]
   likes    Like[]
 }
@@ -36,8 +46,8 @@ model Comment {
   updatedAt DateTime  @updatedAt
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String
-  post      Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
-  postId    String
+  chapter   Chapter   @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  chapterId String
   parent    Comment?  @relation("parentChild", fields: [parentId], references: [id], onDelete: Cascade)
   children  Comment[] @relation("parentChild")
   parentId  String?
