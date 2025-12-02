@@ -14,7 +14,13 @@ export function BookList() {
 
     function handleSearch(e) {
         e.preventDefault()
-        getBooks(query).then(setBooks)
+        console.log("Searching for:", query);
+        getBooks(query)
+            .then(data => {
+                console.log("Search results:", data);
+                setBooks(data);
+            })
+            .catch(err => console.error("Search error:", err));
     }
 
     return (
@@ -52,8 +58,15 @@ export function BookList() {
                 {books.map(book => (
                     <div key={book.id} className="book-card">
                         <Link to={`/books/${book.id}`}>
-                            <h2>{book.title}</h2>
-                            <p className="author">저자: {book.author}</p>
+                            {book.image && (
+                                <div className="book-cover">
+                                    <img src={book.image} alt={book.title} />
+                                </div>
+                            )}
+                            <div className="book-info">
+                                <h2>{book.title}</h2>
+                                <p className="author">저자: {book.author}</p>
+                            </div>
                         </Link>
                     </div>
                 ))}
@@ -62,5 +75,3 @@ export function BookList() {
         </div>
     )
 }
-
-

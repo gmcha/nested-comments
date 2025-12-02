@@ -93,33 +93,119 @@ app.get("/me", async (req, res) => {
 
 // --- Book & Chapter Routes ---
 
+// Helper: Naver API Call
+async function searchNaverBooks(query, display = 10) {
+  const client_id = process.env.NAVER_CLIENT_ID;
+  const client_secret = process.env.NAVER_CLIENT_SECRET;
+  
+  console.log(`[Naver API] Searching for: "${query}"`);
+  console.log(`[Naver API] Client ID exists: ${!!client_id}, Secret exists: ${!!client_secret}`);
+
+  if (!client_id || !client_secret) {
+    console.error("[Naver API] Error: Missing API Keys");
+    return { items: [] };
+  }
+
+  try {
+    const url = `https://openapi.naver.com/v1/search/book.json?query=${encodeURIComponent(query)}&display=${display}`;
+    console.log(`[Naver API] Request URL: ${url}`);
+    
+    const response = await fetch(url, {
+      headers: {
+        "X-Naver-Client-Id": client_id,
+        "X-Naver-Client-Secret": client_secret
+      }
+    });
+
+    const data = await response.json();
+    
+    if (!response.ok) {
+        console.error("[Naver API] Response Error:", response.status, data);
+        return { items: [] };
+    }
+
+    console.log(`[Naver API] Success! Found ${data.items ? data.items.length : 0} items.`);
+    return data;
+  } catch (error) {
+    console.error("[Naver API] Fetch Error:", error);
+    return { items: [] };
+  }
+}
+
 // Get all books or search
 app.get("/books", async (req, res) => {
   const { q } = req.query
-  const where = q ? {
-    OR: [
-      { title: { contains: q } },
-      { author: { contains: q } }
-    ]
-  } : {}
-
-  return await commitToDb(
-    prisma.book.findMany({ where })
-  )
+  
+  if (q) {
+    // Search via Naver API
+    const data = await searchNaverBooks(q);
+    if (data.items) {
+      return data.items.map(item => ({
+        id: item.isbn.split(' ')[0], // Use ISBN as ID for search results
+        title: item.title.replace(/<[^>]+>/g, ''),
+        author: item.author.replace(/<[^>]+>/g, ''),
+        image: item.image,
+        isbn: item.isbn,
+        description: item.description.replace(/<[^>]+>/g, '')
+      }));
+    }
+    return [];
+  } else {
+    // List DB books (or recommendations)
+    return await commitToDb(
+      prisma.book.findMany({ orderBy: { title: 'asc' } })
+    )
+  }
 })
 
 // Get Book Detail (with Chapters)
 app.get("/books/:id", async (req, res) => {
-  return await commitToDb(
-    prisma.book.findUnique({
-      where: { id: req.params.id },
-      include: {
-        chapters: {
-          orderBy: { title: 'asc' } // Or create an order field later
-        }
-      }
-    })
-  )
+  let bookId = req.params.id;
+
+  // 1. Try finding by UUID (DB ID)
+  let book = await prisma.book.findUnique({
+    where: { id: bookId },
+    include: { chapters: { orderBy: { title: 'asc' } } }
+  });
+
+  // 2. If not found, try finding by ISBN
+  if (!book) {
+    book = await prisma.book.findFirst({
+      where: { isbn: { contains: bookId } }, // ISBN check
+      include: { chapters: { orderBy: { title: 'asc' } } }
+    });
+  }
+
+  // 3. If still not found, and it looks like an ISBN (search result click), fetch from Naver and create
+  if (!book && /^\d+/.test(bookId)) { // Simple check if it's numeric (ISBN-like)
+    const searchResult = await searchNaverBooks(bookId, 1); // Search by ISBN (d_isbn option is better but query works)
+    
+    if (searchResult.items && searchResult.items.length > 0) {
+      const item = searchResult.items[0];
+      const title = item.title.replace(/<[^>]+>/g, '');
+      const author = item.author.replace(/<[^>]+>/g, '');
+      
+      // Create Book in DB
+      book = await commitToDb(
+        prisma.book.create({
+          data: {
+            title: title,
+            author: author,
+            isbn: item.isbn,
+            image: item.image,
+            description: item.description.replace(/<[^>]+>/g, '')
+          },
+          include: { chapters: true } // Empty chapters initially
+        })
+      );
+    }
+  }
+
+  if (!book) {
+    return res.status(404).send({ message: "Book not found" });
+  }
+
+  return book;
 })
 
 // Get Chapter Detail (with Comments)

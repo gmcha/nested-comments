@@ -27,8 +27,20 @@ export function BookDetail() {
     return (
         <div className="book-detail-container">
             <Link to="/" className="back-link">← 목록으로 돌아가기</Link>
-            <h1 className="book-title">{book.title}</h1>
-            <p className="book-author">저자: {book.author}</p>
+            
+            <div className="book-detail-header">
+                {book.image && (
+                    <div className="book-cover-large">
+                        <img src={book.image} alt={book.title} />
+                    </div>
+                )}
+                <div className="book-meta">
+                    <h1 className="book-title">{book.title}</h1>
+                    <p className="book-author">저자: {book.author}</p>
+                    {book.isbn && <p className="book-isbn">ISBN: {book.isbn}</p>}
+                    {book.description && <p className="book-desc">{book.description}</p>}
+                </div>
+            </div>
 
             <div className="chapter-list">
                 <h2>챕터 목록</h2>
@@ -42,12 +54,10 @@ export function BookDetail() {
                             </li>
                         ))
                     ) : (
-                        <p>등록된 챕터가 없습니다.</p>
+                        <p>등록된 챕터가 없습니다. (책이 새로 등록된 경우 챕터 생성이 필요합니다)</p>
                     )}
                 </ul>
             </div>
         </div>
     )
 }
-
-

@@ -16,10 +16,13 @@ datasource db {
 }
 
 model Book {
-  id       String    @id @default(uuid())
-  title    String
-  author   String
-  chapters Chapter[]
+  id          String    @id @default(uuid())
+  title       String
+  author      String
+  isbn        String?   @unique
+  image       String?
+  description String?   @db.Text
+  chapters    Chapter[]
 }
 
 model Chapter {
