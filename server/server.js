@@ -137,13 +137,18 @@ const COMMENT_SELECT_FIELDS = {
 }
 
 app.get("/chapters/:id", async (req, res) => {
+  const { sortBy } = req.query
+  const orderBy = sortBy === 'likes' 
+    ? { likes: { _count: 'desc' } } 
+    : { createdAt: 'desc' }
+
   const chapter = await commitToDb(
     prisma.chapter.findUnique({
       where: { id: req.params.id },
       include: {
         book: true,
         comments: {
-          orderBy: { createdAt: "desc" },
+          orderBy: orderBy,
           select: {
             ...COMMENT_SELECT_FIELDS,
             _count: { select: { likes: true } }

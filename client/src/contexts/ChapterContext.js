@@ -11,7 +11,8 @@ export function useChapter() {
 
 export function ChapterProvider({ children }) {
     const { chapterId } = useParams()
-    const { loading, error, value: chapter } = useAsync(() => getChapter(chapterId), [chapterId])
+    const [sortBy, setSortBy] = useState("newest")
+    const { loading, error, value: chapter } = useAsync(() => getChapter(chapterId, sortBy), [chapterId, sortBy])
     const [comments, setComments] = useState([])
     
     const commentsByParentId = useMemo(() => {
@@ -89,6 +90,8 @@ export function ChapterProvider({ children }) {
             updateLocalComment,
             deleteLocalComment,
             toggleLocalCommentLike,
+            sortBy,
+            setSortBy
         }}
     >
         {loading ? (

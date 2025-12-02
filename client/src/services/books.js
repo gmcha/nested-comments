@@ -10,8 +10,10 @@ export function getBook(id) {
     return makeRequest(`/books/${id}`)
 }
 
-export function getChapter(id) {
-    return makeRequest(`/chapters/${id}`)
+export function getChapter(id, sortBy = "newest") {
+    return makeRequest(`/chapters/${id}`, {
+        params: { sortBy }
+    })
 }
 
 

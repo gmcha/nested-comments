@@ -7,7 +7,7 @@ import { useAsyncFn } from "../hooks/useAsync"
 import { createComment } from "../services/comments"
 
 export function ChapterDetail() {
-    const { chapter, rootComments, createLocalComment } = useChapter()
+    const { chapter, rootComments, createLocalComment, sortBy, setSortBy } = useChapter()
     const { user } = useAuth()
     const { loading, error, execute: createCommentFn } = useAsyncFn(createComment)
 
@@ -25,7 +25,24 @@ export function ChapterDetail() {
             </div>
             
             <section>
-                <h3 className="comments-title">토론 ({chapter.comments?.length || 0})</h3>
+                <div className="comments-header">
+                    <h3 className="comments-title">토론 ({chapter.comments?.length || 0})</h3>
+                    <div className="sort-buttons">
+                        <button 
+                            className={`sort-btn ${sortBy === 'newest' ? 'active' : ''}`}
+                            onClick={() => setSortBy("newest")}
+                        >
+                            최신순
+                        </button>
+                        <button 
+                            className={`sort-btn ${sortBy === 'likes' ? 'active' : ''}`}
+                            onClick={() => setSortBy("likes")}
+                        >
+                            좋아요순
+                        </button>
+                    </div>
+                </div>
+
                 {user ? (
                     <CommentForm 
                         loading={loading} 

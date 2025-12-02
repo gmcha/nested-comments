@@ -247,7 +247,7 @@ a {
   color: hsl(235, 100%, 67%);
 }
 
-/* Chapter Detail & Comments (Existing + Updates) */
+/* Chapter Detail & Comments */
 .chapter-header {
   background: white;
   padding: 2rem;
@@ -256,11 +256,43 @@ a {
   margin-bottom: 2rem;
 }
 
-.comments-title {
-  margin-bottom: 1rem;
-  font-size: 1.2rem;
+.comments-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   border-bottom: 2px solid #eee;
+  margin-bottom: 1rem;
   padding-bottom: .5rem;
+}
+
+.comments-title {
+  margin-bottom: 0;
+  font-size: 1.2rem;
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.sort-buttons {
+  display: flex;
+  gap: .5rem;
+}
+
+.sort-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: .25rem .5rem;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.sort-btn.active {
+  color: hsl(235, 100%, 67%);
+  font-weight: bold;
+}
+
+.sort-btn:hover {
+  color: hsl(235, 100%, 67%);
 }
 
 .login-prompt {
