@@ -678,3 +678,58 @@ a {
   color: hsl(235, 100%, 67%);
   margin: 0;
 }
+
+/* Discussion Page */
+.discussion-page-container {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.discussion-page-header {
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #e1e4e8;
+}
+
+.back-to-book-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: transparent;
+  border: 1px solid #e1e4e8;
+  border-radius: 6px;
+  color: #666;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+  margin-bottom: 1rem;
+}
+
+.back-to-book-btn:hover {
+  background: #f6f8fa;
+  border-color: hsl(235, 100%, 67%);
+  color: hsl(235, 100%, 67%);
+}
+
+.discussion-book-info {
+  margin-top: 1rem;
+}
+
+.discussion-title {
+  font-size: 1.5rem;
+  color: hsl(235, 100%, 67%);
+  margin: 0 0 0.5rem 0;
+}
+
+.discussion-book-name {
+  font-size: 1rem;
+  color: #666;
+  margin: 0;
+}
+
+.discussion-content {
+  margin-top: 1rem;
+}

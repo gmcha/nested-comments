@@ -56,11 +56,8 @@ app.post("/signup", async (req, res) => {
   const user = await prisma.user.create({
     data: { email, nickname, password: hashedPassword }
   })
-
-  const token = jwt.sign({ id: user.id, nickname: user.nickname }, JWT_SECRET)
-  res.setCookie("token", token, { path: "/", httpOnly: true })
   
-  return { id: user.id, nickname: user.nickname, email: user.email }
+  return { id: user.id, nickname: user.nickname, email: user.email, message: "회원가입이 완료되었습니다." }
 })
 
 app.post("/login", async (req, res) => {

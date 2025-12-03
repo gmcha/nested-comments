@@ -19,8 +19,8 @@ export function AuthProvider({ children }) {
     }, [])
 
     async function signup(details) {
-        const user = await signupApi(details)
-        setUser(user)
+        await signupApi(details)
+        // 회원가입 후 자동 로그인하지 않음
     }
 
     async function login(details) {

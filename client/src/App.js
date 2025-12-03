@@ -1,6 +1,7 @@
 import { Routes, Route, Link } from 'react-router-dom';
 import { BookList } from "./components/BookList"
 import { BookDetail } from "./components/BookDetail"
+import { BookDiscussion } from "./components/BookDiscussion"
 import { ChapterDetail } from "./components/ChapterDetail"
 import { Login } from "./components/Login"
 import { Signup } from "./components/Signup"
@@ -49,6 +50,14 @@ function App() {
             element={
               <BookProvider>
                 <BookDetail />
+              </BookProvider>
+            } 
+          />
+          <Route 
+            path="/books/:id/discussion" 
+            element={
+              <BookProvider>
+                <BookDiscussion />
               </BookProvider>
             } 
           />
