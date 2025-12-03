@@ -5,6 +5,7 @@ import { ChapterDetail } from "./components/ChapterDetail"
 import { Login } from "./components/Login"
 import { Signup } from "./components/Signup"
 import { ChapterProvider } from "./contexts/ChapterContext"
+import { BookProvider } from "./contexts/BookContext"
 import { AuthProvider } from "./contexts/AuthContext"
 
 function App() {
@@ -15,7 +16,14 @@ function App() {
           <Route path="/" element={<BookList />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
-          <Route path="/books/:id" element={<BookDetail />} />
+          <Route 
+            path="/books/:id" 
+            element={
+              <BookProvider>
+                <BookDetail />
+              </BookProvider>
+            } 
+          />
           <Route 
             path="/chapters/:chapterId" 
             element={

@@ -1,10 +1,13 @@
 import { IconBtn } from './IconBtn.js'
 import { FaHeart, FaReply, FaEdit, FaTrash, FaRegHeart } from "react-icons/fa"
-import { useChapter } from "../contexts/ChapterContext"
+import { useCommentContext } from "../contexts/CommentContext"
 import { CommentList } from "./CommentList"
 import { useState } from "react"
 import { useAsyncFn } from "../hooks/useAsync"
-import { createComment, updateComment, deleteComment, toggleCommentLike } from "../services/comments"
+import { 
+    createComment, updateComment, deleteComment, toggleCommentLike,
+    createBookComment, updateBookComment, deleteBookComment, toggleBookCommentLike 
+} from "../services/comments"
 import { CommentForm } from "./CommentForm"
 import { useAuth } from "../contexts/AuthContext"
 
@@ -18,17 +21,23 @@ export function Comment({ id, message, user, createdAt, likeCount, likedByMe }){
     const [areChildrenHidden, setAreChildrenHidden] = useState(false)
     const [isReplying, setIsReplying] = useState(false)
     const [isEditing, setIsEditing] = useState(false)
-    const { chapter, getReplies, createLocalComment, updateLocalComment, deleteLocalComment, toggleLocalCommentLike } = useChapter()
-    const createCommentFn = useAsyncFn(createComment)
-    const updateCommentFn = useAsyncFn(updateComment)
-    const deleteCommentFn = useAsyncFn(deleteComment)
-    const toggleCommentLikeFn = useAsyncFn(toggleCommentLike)
+    const { chapter, book, contextType, getReplies, createLocalComment, updateLocalComment, deleteLocalComment, toggleLocalCommentLike } = useCommentContext()
+    
+    // Use appropriate API functions based on context type
+    const isBookContext = contextType === "book"
+    const createCommentFn = useAsyncFn(isBookContext ? createBookComment : createComment)
+    const updateCommentFn = useAsyncFn(isBookContext ? updateBookComment : updateComment)
+    const deleteCommentFn = useAsyncFn(isBookContext ? deleteBookComment : deleteComment)
+    const toggleCommentLikeFn = useAsyncFn(isBookContext ? toggleBookCommentLike : toggleCommentLike)
     const childComments = getReplies(id)
     const { user: currentUser } = useAuth()
 
     function onCommentReply(message){
+        const params = isBookContext 
+            ? { bookId: book.id, message, parentId: id }
+            : { chapterId: chapter.id, message, parentId: id }
         return createCommentFn
-            .execute({ chapterId: chapter.id, message, parentId: id })
+            .execute(params)
             .then(comment => {
                 setIsReplying(false)
                 createLocalComment(comment)
@@ -36,8 +45,11 @@ export function Comment({ id, message, user, createdAt, likeCount, likedByMe }){
     }
 
     function onCommentUpdate(message){
+        const params = isBookContext 
+            ? { bookId: book.id, message, id }
+            : { chapterId: chapter.id, message, id }
         return updateCommentFn
-            .execute({ chapterId: chapter.id, message, id })
+            .execute(params)
             .then(comment => {
                 setIsEditing(false)
                 updateLocalComment( id, comment.message )
@@ -45,14 +57,20 @@ export function Comment({ id, message, user, createdAt, likeCount, likedByMe }){
     }
 
     function onCommentDelete(message){
+        const params = isBookContext 
+            ? { bookId: book.id, id }
+            : { chapterId: chapter.id, id }
         return deleteCommentFn
-            .execute({ chapterId: chapter.id, id })
+            .execute(params)
             .then(comment => deleteLocalComment(comment.id))
     }
 
     function onToggleCommentLike() {
+        const params = isBookContext 
+            ? { id, bookId: book.id }
+            : { id, chapterId: chapter.id }
         return toggleCommentLikeFn
-        .execute({ id, chapterId: chapter.id })
+        .execute(params)
         .then(({ addLike }) => toggleLocalCommentLike(id, addLike))
     }
 

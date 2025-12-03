@@ -545,3 +545,99 @@ a {
   gap: .5rem;
   margin-top: .5rem;
 }
+
+/* Book Comments Section */
+.book-comments-section {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid #e1e4e8;
+}
+
+/* Discussion Rooms Section */
+.discussion-rooms-section {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid #e1e4e8;
+}
+
+.section-title {
+  font-size: 1.3rem;
+  color: #24292e;
+  margin-bottom: 1.5rem;
+}
+
+.discussion-rooms-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.discussion-room-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem 1rem;
+  background: linear-gradient(135deg, hsl(235, 100%, 67%) 0%, hsl(255, 100%, 72%) 100%);
+  border: none;
+  border-radius: 12px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+}
+
+.discussion-room-btn:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+}
+
+.discussion-room-btn .room-icon {
+  font-size: 2rem;
+  margin-bottom: 0.75rem;
+}
+
+.discussion-room-btn .room-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.discussion-room-btn .room-count {
+  font-size: 0.8rem;
+  opacity: 0.9;
+}
+
+/* Discussion Header */
+.discussion-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.back-to-rooms-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: transparent;
+  border: 1px solid #e1e4e8;
+  border-radius: 6px;
+  color: #666;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.back-to-rooms-btn:hover {
+  background: #f6f8fa;
+  border-color: hsl(235, 100%, 67%);
+  color: hsl(235, 100%, 67%);
+}
+
+.current-room-title {
+  font-size: 1.2rem;
+  color: hsl(235, 100%, 67%);
+  margin: 0;
+}

@@ -23,6 +23,7 @@ model Book {
   image       String?
   description String?   @db.Text
   chapters    Chapter[]
+  comments    Comment[]
 }
 
 model Chapter {
@@ -49,8 +50,10 @@ model Comment {
   updatedAt DateTime  @updatedAt
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String
-  chapter   Chapter   @relation(fields: [chapterId], references: [id], onDelete: Cascade)
-  chapterId String
+  chapter   Chapter?  @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  chapterId String?
+  book      Book?     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  bookId    String?
   parent    Comment?  @relation("parentChild", fields: [parentId], references: [id], onDelete: Cascade)
   children  Comment[] @relation("parentChild")
   parentId  String?

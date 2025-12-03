@@ -158,27 +158,50 @@ app.get("/books", async (req, res) => {
   }
 })
 
-// Get Book Detail (with Chapters)
+// Get Book Detail (with Chapters and Comments)
 app.get("/books/:id", async (req, res) => {
   let bookId = req.params.id;
+  const { sortBy } = req.query;
+  const orderBy = sortBy === 'likes' 
+    ? { likes: { _count: 'desc' } } 
+    : { createdAt: 'desc' };
 
   // 1. Try finding by UUID (DB ID)
   let book = await prisma.book.findUnique({
     where: { id: bookId },
-    include: { chapters: { orderBy: { title: 'asc' } } }
+    include: { 
+      chapters: { orderBy: { title: 'asc' } },
+      comments: {
+        where: { bookId: bookId },
+        orderBy: orderBy,
+        select: {
+          ...COMMENT_SELECT_FIELDS,
+          _count: { select: { likes: true } }
+        }
+      }
+    }
   });
 
   // 2. If not found, try finding by ISBN
   if (!book) {
     book = await prisma.book.findFirst({
-      where: { isbn: { contains: bookId } }, // ISBN check
-      include: { chapters: { orderBy: { title: 'asc' } } }
+      where: { isbn: { contains: bookId } },
+      include: { 
+        chapters: { orderBy: { title: 'asc' } },
+        comments: {
+          orderBy: orderBy,
+          select: {
+            ...COMMENT_SELECT_FIELDS,
+            _count: { select: { likes: true } }
+          }
+        }
+      }
     });
   }
 
   // 3. If still not found, and it looks like an ISBN (search result click), fetch from Naver and create
-  if (!book && /^\d+/.test(bookId)) { // Simple check if it's numeric (ISBN-like)
-    const searchResult = await searchNaverBooks(bookId, 1); // Search by ISBN (d_isbn option is better but query works)
+  if (!book && /^\d+/.test(bookId)) {
+    const searchResult = await searchNaverBooks(bookId, 1);
     
     if (searchResult.items && searchResult.items.length > 0) {
       const item = searchResult.items[0];
@@ -195,7 +218,7 @@ app.get("/books/:id", async (req, res) => {
             image: item.image,
             description: item.description.replace(/<[^>]+>/g, '')
           },
-          include: { chapters: true } // Empty chapters initially
+          include: { chapters: true, comments: true }
         })
       );
     }
@@ -205,7 +228,29 @@ app.get("/books/:id", async (req, res) => {
     return res.status(404).send({ message: "Book not found" });
   }
 
-  return book;
+  // Add like info for comments
+  const userId = req.user?.id;
+  let likes = [];
+  if (userId && book.comments && book.comments.length > 0) {
+    likes = await prisma.like.findMany({
+      where: {
+        userId: userId,
+        commentId: { in: book.comments.map(c => c.id) }
+      }
+    });
+  }
+
+  return {
+    ...book,
+    comments: book.comments ? book.comments.map(comment => {
+      const { _count, ...commentFields } = comment;
+      return {
+        ...commentFields,
+        likedByMe: likes.find(like => like.commentId === comment.id) ? true : false,
+        likeCount: _count?.likes || 0
+      };
+    }) : []
+  };
 })
 
 // Get Chapter Detail (with Comments)
@@ -270,7 +315,91 @@ app.get("/chapters/:id", async (req, res) => {
   }
 })
 
-// --- Comment Routes ---
+// --- Book Comment Routes ---
+
+app.post("/books/:id/comments", async (req, res) => {
+  if (!req.user) return res.status(401).send({ message: "Unauthorized" })
+  if (!req.body.message) return res.status(400).send({ message: "Message is required" })
+
+  return await commitToDb(
+    prisma.comment.create({
+      data: {
+        message: req.body.message,
+        userId: req.user.id,
+        parentId: req.body.parentId,
+        bookId: req.params.id,
+      },
+      select: COMMENT_SELECT_FIELDS
+    }).then(comment => ({
+      ...comment,
+      likeCount: 0,
+      likedByMe: false
+    }))
+  )
+})
+
+app.put("/books/:bookId/comments/:commentId", async (req, res) => {
+  if (!req.user) return res.status(401).send({ message: "Unauthorized" })
+  if (!req.body.message) return res.status(400).send({ message: "Message is required" })
+
+  const comment = await prisma.comment.findUnique({
+    where: { id: req.params.commentId },
+    select: { userId: true }
+  })
+
+  if (comment.userId !== req.user.id) {
+    return res.status(401).send({ message: "You do not have permission to edit this message" })
+  }
+
+  return await commitToDb(
+    prisma.comment.update({
+      where: { id: req.params.commentId },
+      data: { message: req.body.message },
+      select: { message: true }
+    })
+  )
+})
+
+app.delete("/books/:bookId/comments/:commentId", async (req, res) => {
+  if (!req.user) return res.status(401).send({ message: "Unauthorized" })
+
+  const comment = await prisma.comment.findUnique({
+    where: { id: req.params.commentId },
+    select: { userId: true }
+  })
+
+  if (comment.userId !== req.user.id) {
+    return res.status(401).send({ message: "You do not have permission to delete this message" })
+  }
+
+  return await commitToDb(
+    prisma.comment.delete({
+      where: { id: req.params.commentId },
+      select: { id: true }
+    })
+  )
+})
+
+app.post("/books/:bookId/comments/:commentId/toggleLike", async (req, res) => {
+  if (!req.user) return res.status(401).send({ message: "Unauthorized" })
+
+  const data = {
+    commentId: req.params.commentId,
+    userId: req.user.id
+  }
+
+  const like = await prisma.like.findUnique({
+    where: { userId_commentId: data }
+  })
+
+  if (like == null) {
+    return await commitToDb(prisma.like.create({ data })).then(() => ({ addLike: true }))
+  } else {
+    return await commitToDb(prisma.like.delete({ where: { userId_commentId: data } })).then(() => ({ addLike: false }))
+  }
+})
+
+// --- Chapter Comment Routes ---
 
 app.post("/chapters/:id/comments", async (req, res) => {
   if (!req.user) return res.status(401).send({ message: "Unauthorized" })
