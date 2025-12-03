@@ -93,6 +93,43 @@ a {
 }
 
 /* Main Page (BookList) */
+/* Global Header */
+.global-header {
+  width: 100%;
+  background-color: hsl(235, 100%, 67%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.global-header .logo {
+  text-decoration: none;
+  color: white;
+  transition: opacity 0.2s;
+}
+
+.global-header .logo:hover {
+  opacity: 0.9;
+}
+
+.global-header .logo h1 {
+  color: white;
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+/* Legacy main-header (keeping for compatibility) */
 .main-header {
   display: flex;
   justify-content: space-between;

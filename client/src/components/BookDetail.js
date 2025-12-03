@@ -27,8 +27,6 @@ export function BookDetail() {
 
     return (
         <div className="book-detail-container">
-            <Link to="/" className="back-link">← 목록으로 돌아가기</Link>
-            
             <div className="book-detail-header">
                 {book.image && (
                     <div className="book-cover-large">
