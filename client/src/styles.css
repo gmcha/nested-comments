@@ -47,11 +47,19 @@ a {
 }
 
 .btn-outline {
-  background: transparent;
-  border: 1px solid #ccc;
-  padding: .4em .8em;
+  background: white;
+  border: 2px solid hsl(235, 100%, 67%);
+  color: hsl(235, 100%, 67%);
+  padding: .5em 1em;
   border-radius: .5em;
   cursor: pointer;
+  font-size: .9em;
+  transition: all 0.2s;
+}
+
+.btn-outline:hover {
+  background: hsl(235, 100%, 67%);
+  color: white;
 }
 
 .error-msg {
@@ -597,52 +605,101 @@ a {
   border-top: 1px solid #e1e4e8;
 }
 
-.section-title {
-  font-size: 1.3rem;
-  color: #24292e;
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 1.5rem;
 }
 
+.section-title {
+  font-size: 1.3rem;
+  color: #24292e;
+  margin: 0;
+}
+
+.create-room-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.create-room-form {
+  background: #f6f8fa;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  border: 1px solid #e1e4e8;
+}
+
+.create-room-form input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #e1e4e8;
+  border-radius: 6px;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
+.create-room-form input:focus {
+  outline: none;
+  border-color: hsl(235, 100%, 67%);
+  box-shadow: 0 0 0 3px hsla(235, 100%, 67%, 0.1);
+}
+
+.form-buttons {
+  display: flex;
+  gap: 0.75rem;
+}
+
 .discussion-rooms-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
 }
 
 .discussion-room-btn {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 1.5rem 1rem;
+  padding: 1rem 1.5rem;
   background: linear-gradient(135deg, hsl(235, 100%, 67%) 0%, hsl(255, 100%, 72%) 100%);
   border: none;
-  border-radius: 12px;
+  border-radius: 10px;
   color: white;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.25);
+  text-decoration: none;
 }
 
 .discussion-room-btn:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+  transform: translateX(4px);
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.35);
 }
 
 .discussion-room-btn .room-icon {
-  font-size: 2rem;
-  margin-bottom: 0.75rem;
+  font-size: 1.25rem;
+  margin-right: 1rem;
+  flex-shrink: 0;
 }
 
 .discussion-room-btn .room-title {
   font-size: 1rem;
   font-weight: 600;
-  margin-bottom: 0.25rem;
+  flex: 1;
+  text-align: left;
+  word-break: break-word;
 }
 
 .discussion-room-btn .room-count {
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   opacity: 0.9;
+  margin-left: 1rem;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
 }
 
 /* Discussion Header */

@@ -18,4 +18,11 @@ export function getChapter(id, sortBy = "newest") {
     })
 }
 
+export function createChapter({ bookId, title }) {
+    return makeRequest(`/books/${bookId}/chapters`, {
+        method: "POST",
+        data: { title }
+    })
+}
+
 

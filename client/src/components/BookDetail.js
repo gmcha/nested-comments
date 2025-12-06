@@ -1,15 +1,43 @@
-import { Link } from "react-router-dom"
+import { useState } from "react"
+import { Link, useNavigate } from "react-router-dom"
 import { useBook } from "../contexts/BookContext"
-import { FaComments } from "react-icons/fa"
+import { useAuth } from "../contexts/AuthContext"
+import { useAsyncFn } from "../hooks/useAsync"
+import { createChapter } from "../services/books"
+import { FaComments, FaPlus } from "react-icons/fa"
 
 export function BookDetail() {
     const { book } = useBook()
+    const { user } = useAuth()
+    const navigate = useNavigate()
+    const [showCreateForm, setShowCreateForm] = useState(false)
+    const [newRoomTitle, setNewRoomTitle] = useState("")
+    const { loading, error, execute: createChapterFn } = useAsyncFn(createChapter)
 
     // 토론방 목록 (전체 토론방 + 챕터별 토론방)
     const discussionRooms = [
-        { id: "general", title: "전체 토론방", type: "general", path: `/books/${book.id}/discussion` },
-        ...(book.chapters?.map(ch => ({ id: ch.id, title: ch.title, type: "chapter", path: `/chapters/${ch.id}` })) || [])
+        { id: "general", title: "전체 토론방", type: "general", path: `/books/${book.id}/discussion`, commentCount: book.comments?.length || 0 },
+        ...(book.chapters?.map(ch => ({ 
+            id: ch.id, 
+            title: ch.title, 
+            type: "chapter", 
+            path: `/chapters/${ch.id}`,
+            commentCount: ch._count?.comments || 0
+        })) || [])
     ]
+
+    function handleCreateRoom(e) {
+        e.preventDefault()
+        if (!newRoomTitle.trim()) return
+
+        createChapterFn({ bookId: book.id, title: newRoomTitle.trim() })
+            .then(chapter => {
+                setNewRoomTitle("")
+                setShowCreateForm(false)
+                // 새로 생성된 토론방으로 이동
+                navigate(`/chapters/${chapter.id}`)
+            })
+    }
 
     return (
         <div className="book-detail-container">
@@ -28,7 +56,46 @@ export function BookDetail() {
             </div>
 
             <section className="discussion-rooms-section">
-                <h2 className="section-title">토론방 선택</h2>
+                <div className="section-header">
+                    <h2 className="section-title">토론방 선택</h2>
+                    {user && (
+                        <button 
+                            className="btn create-room-btn"
+                            onClick={() => setShowCreateForm(prev => !prev)}
+                        >
+                            <FaPlus /> 토론방 만들기
+                        </button>
+                    )}
+                </div>
+
+                {showCreateForm && (
+                    <form className="create-room-form" onSubmit={handleCreateRoom}>
+                        <input
+                            type="text"
+                            placeholder="토론방 제목을 입력하세요"
+                            value={newRoomTitle}
+                            onChange={e => setNewRoomTitle(e.target.value)}
+                            autoFocus
+                        />
+                        <div className="form-buttons">
+                            <button type="submit" className="btn" disabled={loading}>
+                                {loading ? "생성 중..." : "생성"}
+                            </button>
+                            <button 
+                                type="button" 
+                                className="btn btn-outline"
+                                onClick={() => {
+                                    setShowCreateForm(false)
+                                    setNewRoomTitle("")
+                                }}
+                            >
+                                취소
+                            </button>
+                        </div>
+                        {error && <div className="error-msg">{error}</div>}
+                    </form>
+                )}
+
                 <div className="discussion-rooms-grid">
                     {discussionRooms.map(room => (
                         <Link 
@@ -38,9 +105,7 @@ export function BookDetail() {
                         >
                             <FaComments className="room-icon" />
                             <span className="room-title">{room.title}</span>
-                            {room.type === "general" && (
-                                <span className="room-count">댓글 수: {book.comments?.length || 0}</span>
-                            )}
+                            <span className="room-count">댓글 수: {room.commentCount}</span>
                         </Link>
                     ))}
                 </div>

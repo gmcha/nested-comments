@@ -167,7 +167,12 @@ app.get("/books/:id", async (req, res) => {
   let book = await prisma.book.findUnique({
     where: { id: bookId },
     include: { 
-      chapters: { orderBy: { title: 'asc' } },
+      chapters: { 
+        orderBy: { title: 'asc' },
+        include: {
+          _count: { select: { comments: true } }
+        }
+      },
       comments: {
         where: { bookId: bookId },
         orderBy: orderBy,
@@ -184,7 +189,12 @@ app.get("/books/:id", async (req, res) => {
     book = await prisma.book.findFirst({
       where: { isbn: { contains: bookId } },
       include: { 
-        chapters: { orderBy: { title: 'asc' } },
+        chapters: { 
+          orderBy: { title: 'asc' },
+          include: {
+            _count: { select: { comments: true } }
+          }
+        },
         comments: {
           orderBy: orderBy,
           select: {
@@ -248,6 +258,29 @@ app.get("/books/:id", async (req, res) => {
       };
     }) : []
   };
+})
+
+// Create Chapter (Discussion Room)
+app.post("/books/:id/chapters", async (req, res) => {
+  if (!req.user) return res.status(401).send({ message: "Unauthorized" })
+  if (!req.body.title || req.body.title.trim() === "") {
+    return res.status(400).send({ message: "토론방 제목을 입력해주세요." })
+  }
+
+  // Check if book exists
+  const book = await prisma.book.findUnique({ where: { id: req.params.id } })
+  if (!book) {
+    return res.status(404).send({ message: "Book not found" })
+  }
+
+  return await commitToDb(
+    prisma.chapter.create({
+      data: {
+        title: req.body.title.trim(),
+        bookId: req.params.id
+      }
+    })
+  )
 })
 
 // Get Chapter Detail (with Comments)
