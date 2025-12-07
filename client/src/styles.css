@@ -100,6 +100,23 @@ a {
   border-radius: 4px;
 }
 
+.auth-container p {
+  margin-top: 1rem;
+  color: #666;
+}
+
+.auth-container p a {
+  color: hsl(235, 100%, 67%);
+  font-weight: bold;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.auth-container p a:hover {
+  color: hsl(235, 100%, 50%);
+  text-decoration: underline;
+}
+
 /* Main Page (BookList) */
 /* Global Header */
 .global-header {

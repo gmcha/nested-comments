@@ -72,7 +72,7 @@ export function BookDetail() {
                     <form className="create-room-form" onSubmit={handleCreateRoom}>
                         <input
                             type="text"
-                            placeholder="토론방 제목을 입력하세요"
+                            placeholder="함께 이야기하고 싶은 '토론 주제'나 '질문'을 입력하세요."
                             value={newRoomTitle}
                             onChange={e => setNewRoomTitle(e.target.value)}
                             autoFocus
