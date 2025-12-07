@@ -37,6 +37,25 @@ app.addHook("onRequest", async (req, res) => {
 
 // --- Auth Routes ---
 
+// Check nickname availability
+app.get("/check-nickname", async (req, res) => {
+  const { nickname } = req.query
+  
+  if (!nickname || nickname.trim() === "") {
+    return res.status(400).send({ available: false, message: "닉네임을 입력해주세요." })
+  }
+
+  const existingUser = await prisma.user.findUnique({
+    where: { nickname: nickname.trim() }
+  })
+
+  if (existingUser) {
+    return { available: false, message: "이미 사용 중인 닉네임입니다." }
+  }
+
+  return { available: true, message: "사용 가능한 닉네임입니다." }
+})
+
 app.post("/signup", async (req, res) => {
   const { email, password, nickname } = req.body
   

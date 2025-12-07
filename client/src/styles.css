@@ -117,6 +117,36 @@ a {
   text-decoration: underline;
 }
 
+/* Nickname check */
+.nickname-input-group {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.nickname-input-group input {
+  flex: 1;
+}
+
+.btn-check {
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.nickname-status {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  margin-bottom: 0;
+}
+
+.nickname-status.success {
+  color: hsl(140, 70%, 40%);
+}
+
+.nickname-status.error {
+  color: hsl(0, 70%, 50%);
+}
+
 /* Main Page (BookList) */
 /* Global Header */
 .global-header {

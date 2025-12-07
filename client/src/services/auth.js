@@ -1,5 +1,12 @@
 import { makeRequest } from "./makeRequest"
 
+export function checkNickname(nickname) {
+    return makeRequest("/check-nickname", {
+        method: "GET",
+        params: { nickname }
+    })
+}
+
 export function signup({ nickname, email, password }) {
     return makeRequest("/signup", {
         method: "POST",
