@@ -214,6 +214,21 @@ a {
   width: 300px;
 }
 
+.search-hint {
+  margin-top: 0.75rem;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.section-title {
+  font-size: 1.4rem;
+  color: #333;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid hsl(235, 100%, 67%);
+  display: inline-block;
+}
+
 /* Book List Grid */
 .book-list {
   display: grid;

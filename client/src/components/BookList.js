@@ -5,6 +5,7 @@ import { getBooks } from "../services/books"
 export function BookList() {
     const [books, setBooks] = useState([])
     const [query, setQuery] = useState("")
+    const [isSearchResult, setIsSearchResult] = useState(false)
 
     useEffect(() => {
         getBooks().then(setBooks)
@@ -17,6 +18,7 @@ export function BookList() {
             .then(data => {
                 console.log("Search results:", data);
                 setBooks(data);
+                setIsSearchResult(query.trim() !== "");
             })
             .catch(err => console.error("Search error:", err));
     }
@@ -33,8 +35,17 @@ export function BookList() {
                     />
                     <button type="submit" className="btn">검색</button>
                 </form>
+                <p className="search-hint">
+                    {isSearchResult 
+                        ? "토론하고 싶은 책을 선택하세요. 클릭하면 토론방으로 이동합니다."
+                        : "읽은 책이 목록에 없나요? 검색창에서 바로 토론을 열 수 있습니다."
+                    }
+                </p>
             </div>
 
+            <h2 className="section-title">
+                {isSearchResult ? `'${query}' 검색 결과` : "토론이 진행중인 책들"}
+            </h2>
             <div className="book-list">
                 {books.map(book => (
                     <div key={book.id} className="book-card">
