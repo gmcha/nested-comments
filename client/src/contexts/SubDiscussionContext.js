@@ -1,17 +1,17 @@
 import React, { useEffect, useMemo, useState } from "react"
 import { useParams } from "react-router-dom"
 import { useAsync } from "../hooks/useAsync"
-import { getChapter } from "../services/books"
+import { getSubDiscussion } from "../services/books"
 import { CommentContext, useCommentContext } from "./CommentContext"
 
-export function useChapter() {
+export function useSubDiscussion() {
     return useCommentContext()
 }
 
-export function ChapterProvider({ children }) {
-    const { chapterId } = useParams()
+export function SubDiscussionProvider({ children }) {
+    const { subDiscussionId } = useParams()
     const [sortBy, setSortBy] = useState("newest")
-    const { loading, error, value: chapter } = useAsync(() => getChapter(chapterId, sortBy), [chapterId, sortBy])
+    const { loading, error, value: subDiscussion } = useAsync(() => getSubDiscussion(subDiscussionId, sortBy), [subDiscussionId, sortBy])
     const [comments, setComments] = useState([])
     
     const commentsByParentId = useMemo(() => {
@@ -24,9 +24,9 @@ export function ChapterProvider({ children }) {
     }, [comments])
 
     useEffect(() => {
-        if (chapter?.comments == null) return
-        setComments(chapter.comments)
-    }, [chapter?.comments])
+        if (subDiscussion?.comments == null) return
+        setComments(subDiscussion.comments)
+    }, [subDiscussion?.comments])
 
     function getReplies(parentId) {
         return commentsByParentId[parentId]
@@ -82,9 +82,9 @@ export function ChapterProvider({ children }) {
     
     return (<CommentContext.Provider 
         value={{
-            chapter: {id: chapterId, ...chapter},
+            subDiscussion: {id: subDiscussionId, ...subDiscussion},
             book: null,
-            contextType: "chapter",
+            contextType: "subDiscussion",
             rootComments: commentsByParentId[null],
             getReplies,
             createLocalComment,
@@ -105,5 +105,3 @@ export function ChapterProvider({ children }) {
         </CommentContext.Provider>
     )
 }
-
-

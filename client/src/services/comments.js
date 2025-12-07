@@ -1,28 +1,28 @@
 import { makeRequest } from "./makeRequest"
 
-// Chapter Comments
-export function createComment({ chapterId, message, parentId }) {
-    return makeRequest(`chapters/${chapterId}/comments`, {
+// SubDiscussion Comments
+export function createComment({ subDiscussionId, message, parentId }) {
+    return makeRequest(`sub-discussions/${subDiscussionId}/comments`, {
         method: "POST",
         data: { message, parentId },
     })
 }
 
-export function updateComment({ chapterId, message, id }) {
-    return makeRequest(`chapters/${chapterId}/comments/${id}`, {
+export function updateComment({ subDiscussionId, message, id }) {
+    return makeRequest(`sub-discussions/${subDiscussionId}/comments/${id}`, {
         method: "PUT",
         data: { message },
     })
 }
 
-export function deleteComment({ chapterId, id }) {
-    return makeRequest(`chapters/${chapterId}/comments/${id}`, {
+export function deleteComment({ subDiscussionId, id }) {
+    return makeRequest(`sub-discussions/${subDiscussionId}/comments/${id}`, {
         method: "DELETE",
     })
 }
 
-export function toggleCommentLike({ chapterId, id }) {
-    return makeRequest(`chapters/${chapterId}/comments/${id}/toggleLike`, {
+export function toggleCommentLike({ subDiscussionId, id }) {
+    return makeRequest(`sub-discussions/${subDiscussionId}/comments/${id}/toggleLike`, {
         method: "POST",
     })
 }

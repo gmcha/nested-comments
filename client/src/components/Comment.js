@@ -21,7 +21,7 @@ export function Comment({ id, message, user, createdAt, likeCount, likedByMe }){
     const [areChildrenHidden, setAreChildrenHidden] = useState(false)
     const [isReplying, setIsReplying] = useState(false)
     const [isEditing, setIsEditing] = useState(false)
-    const { chapter, book, contextType, getReplies, createLocalComment, updateLocalComment, deleteLocalComment, toggleLocalCommentLike } = useCommentContext()
+    const { subDiscussion, book, contextType, getReplies, createLocalComment, updateLocalComment, deleteLocalComment, toggleLocalCommentLike } = useCommentContext()
     
     // Use appropriate API functions based on context type
     const isBookContext = contextType === "book"
@@ -35,7 +35,7 @@ export function Comment({ id, message, user, createdAt, likeCount, likedByMe }){
     function onCommentReply(message){
         const params = isBookContext 
             ? { bookId: book.id, message, parentId: id }
-            : { chapterId: chapter.id, message, parentId: id }
+            : { subDiscussionId: subDiscussion.id, message, parentId: id }
         return createCommentFn
             .execute(params)
             .then(comment => {
@@ -47,7 +47,7 @@ export function Comment({ id, message, user, createdAt, likeCount, likedByMe }){
     function onCommentUpdate(message){
         const params = isBookContext 
             ? { bookId: book.id, message, id }
-            : { chapterId: chapter.id, message, id }
+            : { subDiscussionId: subDiscussion.id, message, id }
         return updateCommentFn
             .execute(params)
             .then(comment => {
@@ -59,7 +59,7 @@ export function Comment({ id, message, user, createdAt, likeCount, likedByMe }){
     function onCommentDelete(message){
         const params = isBookContext 
             ? { bookId: book.id, id }
-            : { chapterId: chapter.id, id }
+            : { subDiscussionId: subDiscussion.id, id }
         return deleteCommentFn
             .execute(params)
             .then(comment => deleteLocalComment(comment.id))
@@ -68,7 +68,7 @@ export function Comment({ id, message, user, createdAt, likeCount, likedByMe }){
     function onToggleCommentLike() {
         const params = isBookContext 
             ? { id, bookId: book.id }
-            : { id, chapterId: chapter.id }
+            : { id, subDiscussionId: subDiscussion.id }
         return toggleCommentLikeFn
         .execute(params)
         .then(({ addLike }) => toggleLocalCommentLike(id, addLike))

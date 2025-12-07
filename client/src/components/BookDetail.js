@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom"
 import { useBook } from "../contexts/BookContext"
 import { useAuth } from "../contexts/AuthContext"
 import { useAsyncFn } from "../hooks/useAsync"
-import { createChapter } from "../services/books"
+import { createSubDiscussion } from "../services/books"
 import { FaComments, FaPlus } from "react-icons/fa"
 
 export function BookDetail() {
@@ -12,17 +12,17 @@ export function BookDetail() {
     const navigate = useNavigate()
     const [showCreateForm, setShowCreateForm] = useState(false)
     const [newRoomTitle, setNewRoomTitle] = useState("")
-    const { loading, error, execute: createChapterFn } = useAsyncFn(createChapter)
+    const { loading, error, execute: createSubDiscussionFn } = useAsyncFn(createSubDiscussion)
 
-    // 토론방 목록 (전체 토론방 + 챕터별 토론방)
+    // 토론방 목록 (전체 토론방 + 하위 토론방)
     const discussionRooms = [
         { id: "general", title: "전체 토론방", type: "general", path: `/books/${book.id}/discussion`, commentCount: book.comments?.length || 0 },
-        ...(book.chapters?.map(ch => ({ 
-            id: ch.id, 
-            title: ch.title, 
-            type: "chapter", 
-            path: `/chapters/${ch.id}`,
-            commentCount: ch._count?.comments || 0
+        ...(book.subDiscussions?.map(sd => ({ 
+            id: sd.id, 
+            title: sd.title, 
+            type: "subDiscussion", 
+            path: `/sub-discussions/${sd.id}`,
+            commentCount: sd._count?.comments || 0
         })) || [])
     ]
 
@@ -30,12 +30,12 @@ export function BookDetail() {
         e.preventDefault()
         if (!newRoomTitle.trim()) return
 
-        createChapterFn({ bookId: book.id, title: newRoomTitle.trim() })
-            .then(chapter => {
+        createSubDiscussionFn({ bookId: book.id, title: newRoomTitle.trim() })
+            .then(subDiscussion => {
                 setNewRoomTitle("")
                 setShowCreateForm(false)
                 // 새로 생성된 토론방으로 이동
-                navigate(`/chapters/${chapter.id}`)
+                navigate(`/sub-discussions/${subDiscussion.id}`)
             })
     }
 

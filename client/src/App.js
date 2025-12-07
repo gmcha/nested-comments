@@ -2,10 +2,10 @@ import { Routes, Route, Link } from 'react-router-dom';
 import { BookList } from "./components/BookList"
 import { BookDetail } from "./components/BookDetail"
 import { BookDiscussion } from "./components/BookDiscussion"
-import { ChapterDetail } from "./components/ChapterDetail"
+import { SubDiscussionDetail } from "./components/SubDiscussionDetail"
 import { Login } from "./components/Login"
 import { Signup } from "./components/Signup"
-import { ChapterProvider } from "./contexts/ChapterContext"
+import { SubDiscussionProvider } from "./contexts/SubDiscussionContext"
 import { BookProvider } from "./contexts/BookContext"
 import { AuthProvider, useAuth } from "./contexts/AuthContext"
 
@@ -62,11 +62,11 @@ function App() {
             } 
           />
           <Route 
-            path="/chapters/:chapterId" 
+            path="/sub-discussions/:subDiscussionId" 
             element={
-              <ChapterProvider>
-                <ChapterDetail />
-              </ChapterProvider>
+              <SubDiscussionProvider>
+                <SubDiscussionDetail />
+              </SubDiscussionProvider>
             } 
           />
         </Routes>

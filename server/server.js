@@ -155,7 +155,7 @@ app.get("/books", async (req, res) => {
   }
 })
 
-// Get Book Detail (with Chapters and Comments)
+// Get Book Detail (with SubDiscussions and Comments)
 app.get("/books/:id", async (req, res) => {
   let bookId = req.params.id;
   const { sortBy } = req.query;
@@ -167,7 +167,7 @@ app.get("/books/:id", async (req, res) => {
   let book = await prisma.book.findUnique({
     where: { id: bookId },
     include: { 
-      chapters: { 
+      subDiscussions: { 
         orderBy: { title: 'asc' },
         include: {
           _count: { select: { comments: true } }
@@ -189,7 +189,7 @@ app.get("/books/:id", async (req, res) => {
     book = await prisma.book.findFirst({
       where: { isbn: { contains: bookId } },
       include: { 
-        chapters: { 
+        subDiscussions: { 
           orderBy: { title: 'asc' },
           include: {
             _count: { select: { comments: true } }
@@ -225,7 +225,7 @@ app.get("/books/:id", async (req, res) => {
             image: item.image,
             description: item.description.replace(/<[^>]+>/g, '')
           },
-          include: { chapters: true, comments: true }
+          include: { subDiscussions: true, comments: true }
         })
       );
     }
@@ -260,8 +260,8 @@ app.get("/books/:id", async (req, res) => {
   };
 })
 
-// Create Chapter (Discussion Room)
-app.post("/books/:id/chapters", async (req, res) => {
+// Create SubDiscussion (Discussion Room)
+app.post("/books/:id/sub-discussions", async (req, res) => {
   if (!req.user) return res.status(401).send({ message: "Unauthorized" })
   if (!req.body.title || req.body.title.trim() === "") {
     return res.status(400).send({ message: "토론방 제목을 입력해주세요." })
@@ -274,7 +274,7 @@ app.post("/books/:id/chapters", async (req, res) => {
   }
 
   return await commitToDb(
-    prisma.chapter.create({
+    prisma.subDiscussion.create({
       data: {
         title: req.body.title.trim(),
         bookId: req.params.id
@@ -283,7 +283,7 @@ app.post("/books/:id/chapters", async (req, res) => {
   )
 })
 
-// Get Chapter Detail (with Comments)
+// Get SubDiscussion Detail (with Comments)
 const COMMENT_SELECT_FIELDS = {
   id: true,
   message: true,
@@ -297,14 +297,14 @@ const COMMENT_SELECT_FIELDS = {
   }
 }
 
-app.get("/chapters/:id", async (req, res) => {
+app.get("/sub-discussions/:id", async (req, res) => {
   const { sortBy } = req.query
   const orderBy = sortBy === 'likes' 
     ? { likes: { _count: 'desc' } } 
     : { createdAt: 'desc' }
 
-  const chapter = await commitToDb(
-    prisma.chapter.findUnique({
+  const subDiscussion = await commitToDb(
+    prisma.subDiscussion.findUnique({
       where: { id: req.params.id },
       include: {
         book: true,
@@ -319,7 +319,7 @@ app.get("/chapters/:id", async (req, res) => {
     })
   )
 
-  if (!chapter) return res.status(404).send({ message: "Chapter not found" })
+  if (!subDiscussion) return res.status(404).send({ message: "SubDiscussion not found" })
 
   const userId = req.user?.id
   let likes = []
@@ -327,14 +327,14 @@ app.get("/chapters/:id", async (req, res) => {
     likes = await prisma.like.findMany({
       where: {
         userId: userId,
-        commentId: { in: chapter.comments.map(c => c.id) }
+        commentId: { in: subDiscussion.comments.map(c => c.id) }
       }
     })
   }
 
   return {
-    ...chapter,
-    comments: chapter.comments.map(comment => {
+    ...subDiscussion,
+    comments: subDiscussion.comments.map(comment => {
       const { _count, ...commentFields } = comment
       return {
         ...commentFields,
@@ -429,9 +429,9 @@ app.post("/books/:bookId/comments/:commentId/toggleLike", async (req, res) => {
   }
 })
 
-// --- Chapter Comment Routes ---
+// --- SubDiscussion Comment Routes ---
 
-app.post("/chapters/:id/comments", async (req, res) => {
+app.post("/sub-discussions/:id/comments", async (req, res) => {
   if (!req.user) return res.status(401).send({ message: "Unauthorized" })
   if (!req.body.message) return res.status(400).send({ message: "Message is required" })
 
@@ -441,7 +441,7 @@ app.post("/chapters/:id/comments", async (req, res) => {
         message: req.body.message,
         userId: req.user.id,
         parentId: req.body.parentId,
-        chapterId: req.params.id,
+        subDiscussionId: req.params.id,
       },
       select: COMMENT_SELECT_FIELDS
     }).then(comment => ({
@@ -452,7 +452,7 @@ app.post("/chapters/:id/comments", async (req, res) => {
   )
 })
 
-app.put("/chapters/:chapterId/comments/:commentId", async (req, res) => {
+app.put("/sub-discussions/:subDiscussionId/comments/:commentId", async (req, res) => {
   if (!req.user) return res.status(401).send({ message: "Unauthorized" })
   if (!req.body.message) return res.status(400).send({ message: "Message is required" })
 
@@ -474,7 +474,7 @@ app.put("/chapters/:chapterId/comments/:commentId", async (req, res) => {
   )
 })
 
-app.delete("/chapters/:chapterId/comments/:commentId", async (req, res) => {
+app.delete("/sub-discussions/:subDiscussionId/comments/:commentId", async (req, res) => {
   if (!req.user) return res.status(401).send({ message: "Unauthorized" })
 
   const comment = await prisma.comment.findUnique({
@@ -494,7 +494,7 @@ app.delete("/chapters/:chapterId/comments/:commentId", async (req, res) => {
   )
 })
 
-app.post("/chapters/:chapterId/comments/:commentId/toggleLike", async (req, res) => {
+app.post("/sub-discussions/:subDiscussionId/comments/:commentId/toggleLike", async (req, res) => {
   if (!req.user) return res.status(401).send({ message: "Unauthorized" })
 
   const data = {

@@ -12,14 +12,14 @@ export function getBook(id, sortBy = "newest") {
     })
 }
 
-export function getChapter(id, sortBy = "newest") {
-    return makeRequest(`/chapters/${id}`, {
+export function getSubDiscussion(id, sortBy = "newest") {
+    return makeRequest(`/sub-discussions/${id}`, {
         params: { sortBy }
     })
 }
 
-export function createChapter({ bookId, title }) {
-    return makeRequest(`/books/${bookId}/chapters`, {
+export function createSubDiscussion({ bookId, title }) {
+    return makeRequest(`/books/${bookId}/sub-discussions`, {
         method: "POST",
         data: { title }
     })

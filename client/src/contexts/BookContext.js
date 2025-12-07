@@ -83,7 +83,7 @@ export function BookProvider({ children }) {
     return (<CommentContext.Provider 
         value={{
             book: { id, ...book },
-            chapter: null,
+            subDiscussion: null,
             contextType: "book",
             rootComments: commentsByParentId[null],
             getReplies,
@@ -105,6 +105,7 @@ export function BookProvider({ children }) {
         </CommentContext.Provider>
     )
 }
+
 
 
 
