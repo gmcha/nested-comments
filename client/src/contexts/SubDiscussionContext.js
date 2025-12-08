@@ -10,7 +10,7 @@ export function useSubDiscussion() {
 
 export function SubDiscussionProvider({ children }) {
     const { subDiscussionId } = useParams()
-    const [sortBy, setSortBy] = useState("newest")
+    const [sortBy, setSortBy] = useState("likes")
     const { loading, error, value: subDiscussion } = useAsync(() => getSubDiscussion(subDiscussionId, sortBy), [subDiscussionId, sortBy])
     const [comments, setComments] = useState([])
     

@@ -6,13 +6,13 @@ export function getBooks(query) {
     })
 }
 
-export function getBook(id, sortBy = "newest") {
+export function getBook(id, sortBy = "likes") {
     return makeRequest(`/books/${id}`, {
         params: { sortBy }
     })
 }
 
-export function getSubDiscussion(id, sortBy = "newest") {
+export function getSubDiscussion(id, sortBy = "likes") {
     return makeRequest(`/sub-discussions/${id}`, {
         params: { sortBy }
     })

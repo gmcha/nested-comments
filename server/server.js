@@ -379,6 +379,13 @@ app.post("/books/:id/comments", async (req, res) => {
   if (!req.user) return res.status(401).send({ message: "Unauthorized" })
   if (!req.body.message) return res.status(400).send({ message: "Message is required" })
 
+  // 사용자가 실제로 존재하는지 확인
+  const user = await prisma.user.findUnique({ where: { id: req.user.id } })
+  if (!user) {
+    res.clearCookie("token")
+    return res.status(401).send({ message: "사용자 정보를 찾을 수 없습니다. 다시 로그인해주세요." })
+  }
+
   return await commitToDb(
     prisma.comment.create({
       data: {
@@ -462,6 +469,13 @@ app.post("/books/:bookId/comments/:commentId/toggleLike", async (req, res) => {
 app.post("/sub-discussions/:id/comments", async (req, res) => {
   if (!req.user) return res.status(401).send({ message: "Unauthorized" })
   if (!req.body.message) return res.status(400).send({ message: "Message is required" })
+
+  // 사용자가 실제로 존재하는지 확인
+  const user = await prisma.user.findUnique({ where: { id: req.user.id } })
+  if (!user) {
+    res.clearCookie("token")
+    return res.status(401).send({ message: "사용자 정보를 찾을 수 없습니다. 다시 로그인해주세요." })
+  }
 
   return await commitToDb(
     prisma.comment.create({

@@ -10,7 +10,7 @@ export function useBook() {
 
 export function BookProvider({ children }) {
     const { id } = useParams()
-    const [sortBy, setSortBy] = useState("newest")
+    const [sortBy, setSortBy] = useState("likes")
     const { loading, error, value: book } = useAsync(() => getBook(id, sortBy), [id, sortBy])
     const [comments, setComments] = useState([])
     
