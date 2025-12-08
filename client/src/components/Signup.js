@@ -20,6 +20,7 @@ export function Signup() {
         }
 
         setCheckingNickname(true)
+        setError("") // 에러 메시지 초기화
         try {
             const result = await checkNickname(nickname.trim())
             setNicknameStatus({ checked: true, available: result.available, message: result.message })

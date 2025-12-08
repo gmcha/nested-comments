@@ -63,12 +63,21 @@ app.post("/signup", async (req, res) => {
     return res.status(400).send({ message: "All fields are required" })
   }
 
-  const existingUser = await prisma.user.findFirst({
-    where: { OR: [{ email }, { nickname }] }
+  // 이메일과 닉네임을 각각 확인
+  const existingEmail = await prisma.user.findUnique({
+    where: { email }
   })
 
-  if (existingUser) {
-    return res.status(409).send({ message: "Email or Nickname already exists" })
+  const existingNickname = await prisma.user.findUnique({
+    where: { nickname }
+  })
+
+  if (existingNickname) {
+    return res.status(409).send({ message: "이미 사용 중인 닉네임입니다. 닉네임 중복 확인을 다시 해주세요." })
+  }
+
+  if (existingEmail) {
+    return res.status(409).send({ message: "이미 가입된 이메일입니다." })
   }
 
   const hashedPassword = await bcrypt.hash(password, 10)
